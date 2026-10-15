@@ -170,6 +170,12 @@
       } catch (err) {
         console.error(err);
         formError.textContent = 'Something went wrong while submitting. Please try again.';
+        const detail = document.createElement('small');
+        detail.className = 'form-error-detail';
+        detail.textContent = err instanceof TypeError
+          ? `Details: could not reach the server (${err.message}).`
+          : `Details: ${err.message}`;
+        formError.append(document.createElement('br'), detail);
         formError.hidden = false;
         button.disabled = false;
         button.textContent = 'Submit';
