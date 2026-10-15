@@ -4,12 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Customer Experience &amp; Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="form-wrap">
-    <img class="logo" src="logo.png" alt="Logo" width="80" height="80">
+  <header class="hero">
+    <img class="logo" src="logo.png" alt="Kotu logo" width="72" height="72">
     <h1>Customer Experience &amp; Feedback</h1>
+    <p class="subtitle">Tell us how we're doing. Every response is read by our team.</p>
+  </header>
+
+  <main class="form-wrap card">
 
     <!--
       Set data-endpoint to your Google Apps Script web app URL
@@ -20,7 +27,7 @@
 
       <!-- 1. Personal Information -->
       <section>
-        <h2>Personal Information</h2>
+        <h2><span class="step">1</span> Personal Information</h2>
 
         <div class="field">
           <label for="name">Name <span class="req">*</span></label>
@@ -37,12 +44,14 @@
 
       <!-- 2. Campus & Location -->
       <section>
-        <h2>Campus &amp; Location</h2>
+        <h2><span class="step">2</span> Campus &amp; Location</h2>
 
         <fieldset class="field">
           <legend>Select your Campus <span class="req">*</span></legend>
-          <label class="choice"><input type="radio" name="campus" value="SNS" required> SNS</label>
-          <label class="choice"><input type="radio" name="campus" value="TKH"> TKH</label>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="campus" value="SNS" required> SNS</label>
+            <label class="choice"><input type="radio" name="campus" value="TKH"> TKH</label>
+          </div>
         </fieldset>
 
         <div class="field conditional" data-show-when="campus=SNS" hidden>
@@ -71,7 +80,7 @@
 
       <!-- 3. Feedback -->
       <section>
-        <h2>What would you like to share?</h2>
+        <h2><span class="step">3</span> Your Feedback</h2>
 
         <fieldset class="field">
           <legend>What would you like to share? <span class="req">*</span></legend>
@@ -84,20 +93,22 @@
         <div class="conditional" data-show-when="share_type=Concern" hidden>
           <fieldset class="field">
             <legend>Product Select <span class="req">*</span></legend>
-            <label class="choice"><input type="radio" name="product" value="Formal Trouser" required> Formal Trouser</label>
-            <label class="choice"><input type="radio" name="product" value="Skirt"> Skirt</label>
-            <label class="choice"><input type="radio" name="product" value="Half-Sleeves Formal Shirt"> Half-Sleeves Formal Shirt</label>
-            <label class="choice"><input type="radio" name="product" value="Full-Sleeves Formal Shirt"> Full-Sleeves Formal Shirt</label>
-            <label class="choice"><input type="radio" name="product" value="Track Pant"> Track Pant</label>
-            <label class="choice"><input type="radio" name="product" value="Fleece Track Pant"> Fleece Track Pant</label>
-            <label class="choice"><input type="radio" name="product" value="Track Shorts"> Track Shorts</label>
-            <label class="choice"><input type="radio" name="product" value="Half-Sleeves House T-Shirt"> Half-Sleeves House T-Shirt</label>
-            <label class="choice"><input type="radio" name="product" value="Full-Sleeves House T-Shirt"> Full-Sleeves House T-Shirt</label>
-            <label class="choice"><input type="radio" name="product" value="Pullover"> Pullover</label>
-            <label class="choice"><input type="radio" name="product" value="All Year Jacket"> All Year Jacket</label>
-            <label class="choice"><input type="radio" name="product" value="Winter Smart Jacket"> Winter Smart Jacket</label>
-            <label class="choice"><input type="radio" name="product" value="Thermal"> Thermal</label>
-            <label class="choice"><input type="radio" name="product" value="Other"> Other</label>
+            <div class="choice-grid">
+              <label class="choice"><input type="radio" name="product" value="Formal Trouser" required> Formal Trouser</label>
+              <label class="choice"><input type="radio" name="product" value="Skirt"> Skirt</label>
+              <label class="choice"><input type="radio" name="product" value="Half-Sleeves Formal Shirt"> Half-Sleeves Formal Shirt</label>
+              <label class="choice"><input type="radio" name="product" value="Full-Sleeves Formal Shirt"> Full-Sleeves Formal Shirt</label>
+              <label class="choice"><input type="radio" name="product" value="Track Pant"> Track Pant</label>
+              <label class="choice"><input type="radio" name="product" value="Fleece Track Pant"> Fleece Track Pant</label>
+              <label class="choice"><input type="radio" name="product" value="Track Shorts"> Track Shorts</label>
+              <label class="choice"><input type="radio" name="product" value="Half-Sleeves House T-Shirt"> Half-Sleeves House T-Shirt</label>
+              <label class="choice"><input type="radio" name="product" value="Full-Sleeves House T-Shirt"> Full-Sleeves House T-Shirt</label>
+              <label class="choice"><input type="radio" name="product" value="Pullover"> Pullover</label>
+              <label class="choice"><input type="radio" name="product" value="All Year Jacket"> All Year Jacket</label>
+              <label class="choice"><input type="radio" name="product" value="Winter Smart Jacket"> Winter Smart Jacket</label>
+              <label class="choice"><input type="radio" name="product" value="Thermal"> Thermal</label>
+              <label class="choice"><input type="radio" name="product" value="Other"> Other</label>
+            </div>
             <div class="conditional nested" data-show-when="product=Other" hidden>
               <input type="text" id="product_other" name="product_other"
                      aria-label="Other product" placeholder="Please specify" required>
@@ -106,7 +117,10 @@
 
           <div class="field">
             <label for="concern_image">Upload product image</label>
-            <input type="file" id="concern_image" name="concern_image" accept="image/*" multiple>
+            <div class="dropzone">
+              <input type="file" id="concern_image" name="concern_image" accept="image/*" multiple>
+              <span class="dropzone-hint">PNG or JPG · up to 5 images, 5 MB each</span>
+            </div>
             <div class="previews" data-for="concern_image"></div>
           </div>
 
@@ -127,7 +141,10 @@
 
           <div class="field">
             <label for="experience_image">Upload supporting images</label>
-            <input type="file" id="experience_image" name="experience_image" accept="image/*" multiple>
+            <div class="dropzone">
+              <input type="file" id="experience_image" name="experience_image" accept="image/*" multiple>
+              <span class="dropzone-hint">PNG or JPG · up to 5 images, 5 MB each</span>
+            </div>
             <div class="previews" data-for="experience_image"></div>
           </div>
         </div>
@@ -136,8 +153,10 @@
         <div class="conditional" data-show-when="share_type=Concern about Services" hidden>
           <fieldset class="field">
             <legend>Concern Area <span class="req">*</span></legend>
-            <label class="choice"><input type="radio" name="concern_area" value="Team Member" required> Team Member</label>
-            <label class="choice"><input type="radio" name="concern_area" value="Other"> Other</label>
+            <div class="choice-grid">
+              <label class="choice"><input type="radio" name="concern_area" value="Team Member" required> Team Member</label>
+              <label class="choice"><input type="radio" name="concern_area" value="Other"> Other</label>
+            </div>
           </fieldset>
 
           <div class="field conditional" data-show-when="concern_area=*" hidden>
@@ -149,14 +168,19 @@
       </section>
 
       <p class="form-error" id="form-error" role="alert" hidden></p>
-      <button type="submit" id="submit-btn">Submit</button>
+      <button type="submit" id="submit-btn">Submit Feedback</button>
     </form>
 
     <div class="thank-you" id="thank-you" hidden>
+      <div class="check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="32" height="32"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
       <h2>Thank you!</h2>
       <p>Your feedback has been submitted.</p>
     </div>
   </main>
+
+  <footer class="site-footer">© Kotu · <a href="https://www.kotu.co.in" target="_blank" rel="noopener">www.kotu.co.in</a></footer>
 
   <script src="script.js"></script>
 </body>

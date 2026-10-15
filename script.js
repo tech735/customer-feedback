@@ -178,7 +178,7 @@
         formError.append(document.createElement('br'), detail);
         formError.hidden = false;
         button.disabled = false;
-        button.textContent = 'Submit';
+        button.textContent = 'Submit Feedback';
         return;
       }
     } else {
