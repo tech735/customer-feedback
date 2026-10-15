@@ -104,33 +104,79 @@
     return !firstInvalid;
   }
 
+  // Uploads
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+  const MAX_IMAGES = 5;
+
+  function enabledFiles() {
+    return Array.from(form.querySelectorAll('input[type="file"]:not(:disabled)'))
+      .flatMap((input) => Array.from(input.files));
+  }
+
+  function encodeFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve({
+        name: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        data: reader.result.split(',')[1],
+      });
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formError = document.getElementById('form-error');
     formError.hidden = true;
     if (!validate()) return;
 
-    const data = new FormData(form);
+    const files = enabledFiles();
+    const tooBig = files.find((f) => f.size > MAX_IMAGE_BYTES);
+    if (tooBig) {
+      formError.textContent = `"${tooBig.name}" is larger than 5 MB. Please choose a smaller image.`;
+      formError.hidden = false;
+      return;
+    }
+    if (files.length > MAX_IMAGES) {
+      formError.textContent = `Please upload at most ${MAX_IMAGES} images.`;
+      formError.hidden = false;
+      return;
+    }
+
+    const fields = {};
+    new FormData(form).forEach((value, key) => {
+      if (typeof value === 'string') fields[key] = value;
+    });
+
     const endpoint = form.dataset.endpoint;
     const button = document.getElementById('submit-btn');
 
     if (endpoint) {
       button.disabled = true;
+      button.textContent = 'Submitting…';
       try {
+        const payload = { fields, files: await Promise.all(files.map(encodeFile)) };
+        // text/plain keeps this a "simple" request, which Google Apps Script
+        // web apps accept without a CORS preflight.
         const res = await fetch(endpoint, {
           method: 'POST',
-          body: data,
-          headers: { Accept: 'application/json' },
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json();
+        if (!res.ok || !result.ok) throw new Error(result.error || `HTTP ${res.status}`);
       } catch (err) {
+        console.error(err);
         formError.textContent = 'Something went wrong while submitting. Please try again.';
         formError.hidden = false;
         button.disabled = false;
+        button.textContent = 'Submit';
         return;
       }
     } else {
-      console.log('Form submission (no endpoint configured):', Object.fromEntries(data));
+      console.log('Form submission (no endpoint configured):', fields, files);
     }
 
     form.hidden = true;
