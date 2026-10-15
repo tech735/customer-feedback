@@ -32,8 +32,8 @@ body {
 
 .logo {
   display: block;
-  max-width: 160px;
-  max-height: 120px;
+  width: 80px;
+  height: 80px;
   margin-bottom: 24px;
 }
 
