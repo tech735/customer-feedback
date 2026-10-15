@@ -42,6 +42,161 @@
   });
   form.addEventListener('input', (e) => clearError(e.target));
 
+  // Custom dropdowns (styled after shadcn/ui Select). The native <select>
+  // stays in the form, hidden, so validation and submission are unchanged.
+  const CHEVRON = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const CHECK = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function enhanceSelect(select) {
+    const label = form.querySelector(`label[for="${select.id}"]`);
+    const wrap = document.createElement('div');
+    wrap.className = 'select';
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+    select.classList.add('select-native');
+    select.tabIndex = -1;
+    select.setAttribute('aria-hidden', 'true');
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.id = `${select.id}-trigger`;
+    trigger.className = 'select-trigger';
+    trigger.setAttribute('role', 'combobox');
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', `${select.id}-listbox`);
+    trigger.innerHTML = `<span class="select-value"></span>${CHEVRON}`;
+    const valueEl = trigger.firstElementChild;
+    if (label) {
+      label.id = label.id || `${select.id}-label`;
+      label.htmlFor = trigger.id;
+      trigger.setAttribute('aria-labelledby', `${label.id} ${trigger.id}`);
+    }
+
+    const list = document.createElement('div');
+    list.id = `${select.id}-listbox`;
+    list.className = 'select-content';
+    list.setAttribute('role', 'listbox');
+    list.tabIndex = -1;
+    list.hidden = true;
+    if (label) list.setAttribute('aria-labelledby', label.id);
+
+    const options = Array.from(select.options).filter((o) => !o.disabled);
+    const items = options.map((opt, i) => {
+      const item = document.createElement('div');
+      item.id = `${select.id}-option-${i}`;
+      item.className = 'select-item';
+      item.setAttribute('role', 'option');
+      item.innerHTML = `<span class="select-item-text"></span><span class="select-item-indicator">${CHECK}</span>`;
+      item.firstElementChild.textContent = opt.textContent;
+      item.addEventListener('pointermove', () => highlight(i));
+      item.addEventListener('click', () => choose(i));
+      list.appendChild(item);
+      return item;
+    });
+    wrap.append(trigger, list);
+
+    const placeholder = select.querySelector('option[value=""]')?.textContent || 'Select…';
+    let active = -1;
+    let typed = '';
+    let typedTimer;
+
+    function render() {
+      const i = options.findIndex((o) => o.selected && o.value !== '');
+      valueEl.textContent = i >= 0 ? options[i].textContent : placeholder;
+      trigger.toggleAttribute('data-placeholder', i < 0);
+      items.forEach((item, j) => item.setAttribute('aria-selected', String(j === i)));
+      trigger.disabled = select.disabled;
+    }
+
+    function highlight(i) {
+      active = i;
+      items.forEach((item, j) => item.toggleAttribute('data-highlighted', j === i));
+      if (i >= 0) {
+        list.setAttribute('aria-activedescendant', items[i].id);
+        items[i].scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    function open() {
+      if (select.disabled || !list.hidden) return;
+      list.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      // Open upwards when there isn't room below.
+      const below = window.innerHeight - trigger.getBoundingClientRect().bottom;
+      list.dataset.side = below < list.offsetHeight + 8 && trigger.getBoundingClientRect().top > below ? 'top' : 'bottom';
+      const selected = options.findIndex((o) => o.selected && o.value !== '');
+      highlight(selected >= 0 ? selected : 0);
+      list.focus({ preventScroll: true });
+    }
+
+    function close(focusTrigger) {
+      if (list.hidden) return;
+      list.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      highlight(-1);
+      if (focusTrigger) trigger.focus();
+    }
+
+    function choose(i) {
+      if (!options[i].selected) {
+        options[i].selected = true;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      render();
+      close(true);
+    }
+
+    function typeahead(char) {
+      clearTimeout(typedTimer);
+      typed += char.toLowerCase();
+      typedTimer = setTimeout(() => { typed = ''; }, 600);
+      const i = options.findIndex((o) => o.textContent.toLowerCase().startsWith(typed));
+      if (i >= 0) highlight(i);
+    }
+
+    trigger.addEventListener('click', () => (list.hidden ? open() : close(true)));
+    trigger.addEventListener('keydown', (e) => {
+      if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
+        e.preventDefault();
+        open();
+      } else if (e.key.length === 1 && /\S/.test(e.key)) {
+        open();
+        typeahead(e.key);
+      }
+    });
+
+    list.addEventListener('keydown', (e) => {
+      const last = items.length - 1;
+      if (e.key === 'ArrowDown') highlight(Math.min(active + 1, last));
+      else if (e.key === 'ArrowUp') highlight(Math.max(active - 1, 0));
+      else if (e.key === 'Home') highlight(0);
+      else if (e.key === 'End') highlight(last);
+      else if (e.key === ' ' && typed) typeahead(' ');
+      else if (e.key === 'Enter' || e.key === ' ') { if (active >= 0) choose(active); }
+      else if (e.key === 'Escape') close(true);
+      else if (e.key === 'Tab') { close(false); return; }
+      else if (e.key.length === 1 && /\S/.test(e.key)) typeahead(e.key);
+      else return;
+      e.preventDefault();
+    });
+
+    list.addEventListener('focusout', (e) => {
+      if (!wrap.contains(e.relatedTarget)) close(false);
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (!wrap.contains(e.target)) close(false);
+    });
+
+    // Keep in sync when the field is shown/hidden (disabled) or reset.
+    new MutationObserver(render).observe(select, { attributes: true, attributeFilter: ['disabled'] });
+    select.addEventListener('change', render);
+    select.selectTrigger = trigger;
+    render();
+  }
+
+  form.querySelectorAll('select').forEach(enhanceSelect);
+
   // Image previews
   form.querySelectorAll('input[type="file"]').forEach((input) => {
     input.addEventListener('change', () => {
@@ -102,7 +257,7 @@
       firstInvalid = firstInvalid || input;
     });
 
-    if (firstInvalid) firstInvalid.focus();
+    if (firstInvalid) (firstInvalid.selectTrigger || firstInvalid).focus();
     return !firstInvalid;
   }
 
