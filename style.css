@@ -372,3 +372,26 @@ button[type="submit"]:disabled { opacity: 0.65; cursor: wait; }
 
 .site-footer a { color: var(--brand); text-decoration: none; font-weight: 500; }
 .site-footer a:hover { text-decoration: underline; }
+
+/* Product groups */
+.choice-group-title {
+  margin: 18px 0 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+legend + .hint + .conditional > .choice-group-title:first-child,
+legend + .hint + .conditional + .conditional > .choice-group-title:first-child { margin-top: 4px; }
+
+.hint {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: #FAFAFE;
+  border: 1px dashed #C9C7DC;
+  border-radius: 10px;
+}

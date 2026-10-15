@@ -93,25 +93,77 @@
         <div class="conditional" data-show-when="share_type=Product Enquiry" hidden>
           <fieldset class="field">
             <legend>Product Select <span class="req">*</span></legend>
-            <div class="choice-grid">
-              <label class="choice"><input type="radio" name="product" value="Formal Trouser" required> Formal Trouser</label>
-              <label class="choice"><input type="radio" name="product" value="Skirt"> Skirt</label>
-              <label class="choice"><input type="radio" name="product" value="Half-Sleeves Formal Shirt"> Half-Sleeves Formal Shirt</label>
-              <label class="choice"><input type="radio" name="product" value="Full-Sleeves Formal Shirt"> Full-Sleeves Formal Shirt</label>
-              <label class="choice"><input type="radio" name="product" value="Track Pant"> Track Pant</label>
-              <label class="choice"><input type="radio" name="product" value="Fleece Track Pant"> Fleece Track Pant</label>
-              <label class="choice"><input type="radio" name="product" value="Track Shorts"> Track Shorts</label>
-              <label class="choice"><input type="radio" name="product" value="Half-Sleeves House T-Shirt"> Half-Sleeves House T-Shirt</label>
-              <label class="choice"><input type="radio" name="product" value="Full-Sleeves House T-Shirt"> Full-Sleeves House T-Shirt</label>
-              <label class="choice"><input type="radio" name="product" value="Pullover"> Pullover</label>
-              <label class="choice"><input type="radio" name="product" value="All Year Jacket"> All Year Jacket</label>
-              <label class="choice"><input type="radio" name="product" value="Winter Smart Jacket"> Winter Smart Jacket</label>
-              <label class="choice"><input type="radio" name="product" value="Thermal"> Thermal</label>
-              <label class="choice"><input type="radio" name="product" value="Other"> Other</label>
+            <p class="hint conditional" data-show-when="campus=" hidden>Select your campus above to see its products.</p>
+            <div class="conditional" data-show-when="campus=SNS" hidden>
+              <p class="choice-group-title">Winter</p>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Fleece Track Pant" required> Fleece Track Pant</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Blazer"> Blazer</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Fullsleeve Jacket"> Fullsleeve Jacket</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Sleeveless Jacket"> Sleeveless Jacket</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Sweatshirt"> Sweatshirt</label>
+              </div>
+              <p class="choice-group-title">Summer &amp; Mid-Season</p>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Formal Trouser (B)"> Formal Trouser (B)</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Formal Trouser (G)"> Formal Trouser (G)</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Halfsleeve Formal Shirt (B)"> Halfsleeve Formal Shirt (B)</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Halfsleeve Formal Shirt (G)"> Halfsleeve Formal Shirt (G)</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Fullsleeve Formal Shirt (B)"> Fullsleeve Formal Shirt (B)</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Fullsleeve Formal Shirt (G)"> Fullsleeve Formal Shirt (G)</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS House T-Shirt H/S"> House T-Shirt H/S</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS House T-Shirt Fullsleeves"> House T-Shirt Fullsleeves</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Skirt"> Skirt</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Track Pant Summer"> Track Pant Summer</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Track Shorts"> Track Shorts</label>
+              </div>
+              <p class="choice-group-title">Accessories &amp; Others</p>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Belt"> Belt</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Socks"> Socks</label>
+                <label class="choice"><input type="radio" name="product_sns" value="SNS Tie"> Tie</label>
+                <label class="choice"><input type="radio" name="product_sns" value="Thermals"> Thermals</label>
+                <label class="choice"><input type="radio" name="product_sns" value="Other"> Other</label>
+              </div>
+              <div class="conditional nested" data-show-when="product_sns=Other" hidden>
+                <input type="text" id="product_other_sns" name="product_other"
+                       aria-label="Other product" placeholder="Please specify" required>
+              </div>
             </div>
-            <div class="conditional nested" data-show-when="product=Other" hidden>
-              <input type="text" id="product_other" name="product_other"
-                     aria-label="Other product" placeholder="Please specify" required>
+            <div class="conditional" data-show-when="campus=TKH" hidden>
+              <p class="choice-group-title">Winter</p>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Fleece Track Pant" required> Fleece Track Pant</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Winter Smart Jacket (U)"> Winter Smart Jacket (U)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Winter Smart Jacket (M)"> Winter Smart Jacket (M)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Winter Smart Jacket (F)"> Winter Smart Jacket (F)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Lightweight Jacket"> Lightweight Jacket</label>
+              </div>
+              <p class="choice-group-title">Summer &amp; Mid-Season</p>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Formal Trouser (B)"> Formal Trouser (B)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Formal Trouser (G)"> Formal Trouser (G)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Halfsleeve Formal Shirt (B)"> Halfsleeve Formal Shirt (B)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Halfsleeve Formal Shirt (G)"> Halfsleeve Formal Shirt (G)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Fullsleeve Formal Shirt (B)"> Fullsleeve Formal Shirt (B)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Fullsleeve Formal Shirt (G)"> Fullsleeve Formal Shirt (G)</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH House T-Shirt H/S"> House T-Shirt H/S</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH House T-Shirt Fullsleeves"> House T-Shirt Fullsleeves</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Skirt"> Skirt</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Track Pant Summer"> Track Pant Summer</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Track Shorts"> Track Shorts</label>
+              </div>
+              <p class="choice-group-title">Accessories &amp; Others</p>
+              <div class="choice-grid">
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Belt"> Belt</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="TKH Socks"> Socks</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="Thermals"> Thermals</label>
+                <label class="choice"><input type="radio" name="product_tkh" value="Other"> Other</label>
+              </div>
+              <div class="conditional nested" data-show-when="product_tkh=Other" hidden>
+                <input type="text" id="product_other_tkh" name="product_other"
+                       aria-label="Other product" placeholder="Please specify" required>
+              </div>
             </div>
           </fieldset>
 

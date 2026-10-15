@@ -12,7 +12,9 @@
   function ruleMatches(el) {
     const [name, expected] = el.dataset.showWhen.split('=');
     const value = radioValue(name);
-    return expected === '*' ? value !== null : value === expected;
+    if (expected === '*') return value !== null;
+    if (expected === '') return value === null;
+    return value === expected;
   }
 
   function isVisible(el) {
@@ -149,6 +151,11 @@
     new FormData(form).forEach((value, key) => {
       if (typeof value === 'string') fields[key] = value;
     });
+    // Each campus has its own product list; the sheet gets a single Product.
+    const product = fields.product_sns || fields.product_tkh;
+    delete fields.product_sns;
+    delete fields.product_tkh;
+    if (product) fields.product = product;
 
     const endpoint = form.dataset.endpoint;
     const button = document.getElementById('submit-btn');
