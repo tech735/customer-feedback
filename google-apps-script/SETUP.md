@@ -17,6 +17,9 @@ headers on the first submission.
 1. In the Sheet, open **Extensions → Apps Script**.
 2. Delete everything in `Code.gs` and paste in the full contents of
    [`Code.gs`](Code.gs) from this folder.
+   If you created the script at script.google.com instead of from the Sheet,
+   paste the Sheet's ID (the part of its URL between `/d/` and `/edit`) into
+   `SPREADSHEET_ID` at the top.
 3. Click **Save** (💾). You can rename the project, e.g. *Feedback Form Backend*.
 
 ## 3. Deploy it as a web app

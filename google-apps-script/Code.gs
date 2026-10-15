@@ -6,6 +6,11 @@
  * (Execute as: Me, Who has access: Anyone). See SETUP.md.
  */
 
+// Only needed if this script was NOT created from the Sheet
+// (Extensions → Apps Script). Paste the Sheet's ID here: it is the long part
+// of the Sheet URL between /d/ and /edit.
+const SPREADSHEET_ID = '';
+
 // Responses are written to this tab (created automatically).
 const SHEET_NAME = 'Responses';
 
@@ -68,7 +73,10 @@ function doGet() {
 }
 
 function getSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SPREADSHEET_ID
+    ? SpreadsheetApp.openById(SPREADSHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error('No spreadsheet: set SPREADSHEET_ID at the top of Code.gs.');
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) {
