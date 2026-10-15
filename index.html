@@ -84,13 +84,13 @@
 
         <fieldset class="field">
           <legend>What would you like to share? <span class="req">*</span></legend>
-          <label class="choice"><input type="radio" name="share_type" value="Concern" required> Concern</label>
-          <label class="choice"><input type="radio" name="share_type" value="Share your Experience"> Share your Experience</label>
+          <label class="choice"><input type="radio" name="share_type" value="Share your Experience" required> Share your Experience</label>
+          <label class="choice"><input type="radio" name="share_type" value="Product Enquiry"> Product Enquiry</label>
           <label class="choice"><input type="radio" name="share_type" value="Concern about Services"> Concern about Services</label>
         </fieldset>
 
-        <!-- Condition A: Concern -->
-        <div class="conditional" data-show-when="share_type=Concern" hidden>
+        <!-- Condition A: Product Enquiry -->
+        <div class="conditional" data-show-when="share_type=Product Enquiry" hidden>
           <fieldset class="field">
             <legend>Product Select <span class="req">*</span></legend>
             <div class="choice-grid">
@@ -127,7 +127,7 @@
           <div class="field">
             <label for="concern_feedback">Feedback <span class="req">*</span></label>
             <textarea id="concern_feedback" name="concern_feedback" rows="4"
-                      placeholder="Describe your concern in detail" required></textarea>
+                      placeholder="Describe your enquiry in detail" required></textarea>
           </div>
         </div>
 
