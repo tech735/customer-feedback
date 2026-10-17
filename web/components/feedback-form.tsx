@@ -276,7 +276,7 @@ export function FeedbackForm() {
 
             {state.campus && (
               <fieldset className="space-y-3 animate-in fade-in-0 slide-in-from-top-2 duration-300">
-                <legend className="mb-3 text-sm font-medium">Location</legend>
+                <legend className="mb-3 text-sm font-medium">Select {state.campus} Location</legend>
                 <RadioGroup
                   value={state.location}
                   onValueChange={(v) => update("location", v)}
@@ -321,7 +321,7 @@ export function FeedbackForm() {
           <fieldset className="space-y-4">
             <div className="flex items-baseline justify-between gap-4">
               <legend className="text-sm font-medium">
-                Products <span className="font-normal text-muted-foreground">· select all that apply</span>
+                Select Product <span className="font-normal text-muted-foreground">· Select all that apply</span>
               </legend>
               {state.products.length > 0 && (
                 <span className="shrink-0 text-xs font-medium text-primary">{state.products.length} selected</span>
