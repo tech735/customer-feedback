@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "dev",
+            "type": "shell",
+            "command": "npm run dev",
+            "options": { "cwd": "${workspaceFolder}/web" },
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "next-dev",
+                "pattern": { "regexp": "^x\\bx$" },
+                "background": {
+                    "activeBegins": true,
+                    "beginsPattern": "Next\\.js",
+                    "endsPattern": "Ready in"
+                }
+            }
+        }
+    ]
+}
