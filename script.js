@@ -2,19 +2,15 @@
   const form = document.getElementById('feedback-form');
   const conditionals = Array.from(form.querySelectorAll('.conditional'));
 
-  function radioValue(name) {
-    const checked = form.querySelector(`input[name="${name}"]:checked`);
-    return checked ? checked.value : null;
-  }
-
   // A block is visible when its own rule matches AND every enclosing
-  // conditional block is visible too.
+  // conditional block is visible too. Rules: name=value (that option is
+  // checked), name=* (anything checked), name= (nothing checked).
   function ruleMatches(el) {
     const [name, expected] = el.dataset.showWhen.split('=');
-    const value = radioValue(name);
-    if (expected === '*') return value !== null;
-    if (expected === '') return value === null;
-    return value === expected;
+    const anyChecked = form.querySelector(`input[name="${name}"]:checked`);
+    if (expected === '*') return !!anyChecked;
+    if (expected === '') return !anyChecked;
+    return !!form.querySelector(`input[name="${name}"][value="${expected}"]:checked`);
   }
 
   function isVisible(el) {
@@ -37,7 +33,7 @@
   }
 
   form.addEventListener('change', (e) => {
-    if (e.target.type === 'radio') updateVisibility();
+    if (e.target.type === 'radio' || e.target.type === 'checkbox') updateVisibility();
     clearError(e.target);
   });
   form.addEventListener('input', (e) => clearError(e.target));
@@ -215,7 +211,7 @@
 
   // Validation
   function errorHost(input) {
-    return input.type === 'radio' ? input.closest('fieldset') : input.closest('.field, .nested') || input.parentElement;
+    return input.type === 'radio' || input.type === 'checkbox' ? input.closest('fieldset') : input.closest('.field, .nested') || input.parentElement;
   }
 
   function clearError(input) {
@@ -255,6 +251,17 @@
       else if (input.validity.patternMismatch) message = 'Please enter a valid phone number.';
       showError(input, message);
       firstInvalid = firstInvalid || input;
+    });
+
+    form.querySelectorAll('[data-required-group]:not([hidden])').forEach((group) => {
+      const boxes = group.querySelectorAll(`input[name="${group.dataset.requiredGroup}"]`);
+      if (!boxes.length || boxes[0].disabled) return;
+      clearError(boxes[0]);
+      if (Array.from(boxes).some((b) => b.checked)) return;
+      showError(boxes[0], 'Please select at least one product.');
+      if (!firstInvalid || boxes[0].compareDocumentPosition(firstInvalid) & Node.DOCUMENT_POSITION_FOLLOWING) {
+        firstInvalid = boxes[0];
+      }
     });
 
     if (firstInvalid) (firstInvalid.selectTrigger || firstInvalid).focus();
@@ -302,15 +309,19 @@
       return;
     }
 
+    const data = new FormData(form);
     const fields = {};
-    new FormData(form).forEach((value, key) => {
+    data.forEach((value, key) => {
       if (typeof value === 'string') fields[key] = value;
     });
-    // Each campus has its own product list; the sheet gets a single Product.
-    const product = fields.product_sns || fields.product_tkh;
+    // Each campus has its own product list and several products can be
+    // ticked; the sheet gets them in one Product cell, e.g. "SNS Belt, Other: Cap".
+    const products = [...data.getAll('product_sns'), ...data.getAll('product_tkh')]
+      .map((p) => (p === 'Other' && fields.product_other ? `Other: ${fields.product_other}` : p));
     delete fields.product_sns;
     delete fields.product_tkh;
-    if (product) fields.product = product;
+    delete fields.product_other;
+    if (products.length) fields.product = products.join(', ');
 
     const endpoint = form.dataset.endpoint;
     const button = document.getElementById('submit-btn');

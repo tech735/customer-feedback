@@ -505,3 +505,19 @@ legend + .hint + .conditional + .conditional > .choice-group-title:first-child {
 }
 
 .select-item[aria-selected="true"] .select-item-indicator { display: flex; }
+
+/* Multi-select products */
+input[type="checkbox"] {
+  accent-color: var(--brand);
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: none;
+}
+
+.legend-hint {
+  margin-left: 6px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+}

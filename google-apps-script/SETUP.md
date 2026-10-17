@@ -61,7 +61,7 @@ the **Responses** tab within a few seconds.
 | Name, Contact | Personal information |
 | Campus, Location | SNS/TKH and the chosen location |
 | What would you like to share? | Share your Experience / Product Enquiry / Concern about Services |
-| Product | Product chosen (or `Other: …` with the typed text) |
+| Product | Products ticked, comma-separated (e.g. `SNS Blazer, Thermals, Other: Cap`) |
 | Concern Area | Team Member / Other (service concerns only) |
 | Feedback / Remarks | The text the customer wrote |
 | Images | Google Drive links to uploaded images, one per line |
