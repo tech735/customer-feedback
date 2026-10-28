@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ResponseImages } from "@/components/admin/response-images";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { campusName } from "@/lib/form-options";
 import type { FeedbackResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -82,10 +83,10 @@ export function ResponseDetail({ response: r }: { response: FeedbackResponse }) 
       )}
 
       <dl className="divide-y rounded-xl border px-4">
-        <Row label="Campus">
+        <Row label="School">
           <span className="inline-flex items-center gap-1.5">
             <MapPinIcon className="size-3.5 text-muted-foreground" />
-            {[r.campus, r.location].filter(Boolean).join(" · ") || "—"}
+            {[campusName(r.campus), r.location].filter(Boolean).join(" · ") || "—"}
           </span>
         </Row>
         {products.length > 0 && (

@@ -35,7 +35,6 @@ import { cn } from "@/lib/utils";
 type FormState = {
   name: string;
   contact: string;
-  campus: Campus | "";
   location: string;
   shareType: ShareType | "";
   products: string[];
@@ -48,7 +47,6 @@ type FormState = {
 const EMPTY: FormState = {
   name: "",
   contact: "",
-  campus: "",
   location: "",
   shareType: "",
   products: [],
@@ -60,7 +58,7 @@ const EMPTY: FormState = {
 
 const STEPS = [
   "About you",
-  "Your campus",
+  "Your location",
   "What would you like to share?",
   "Tell us more",
 ] as const;
@@ -80,10 +78,7 @@ function validate(step: number, s: FormState): Errors {
     if (!s.contact.trim()) e.contact = "Please enter your phone number.";
     else if (!PHONE_PATTERN.test(s.contact.trim())) e.contact = "Please enter a valid phone number.";
   }
-  if (step === 1) {
-    if (!s.campus) e.campus = "Please choose your campus.";
-    else if (!s.location) e.location = "Please choose a location.";
-  }
+  if (step === 1 && !s.location) e.location = "Please choose a location.";
   if (step === 2 && !s.shareType) e.shareType = "Please choose an option.";
   if (step === 3) {
     if (s.shareType === "Product Enquiry") {
@@ -96,11 +91,11 @@ function validate(step: number, s: FormState): Errors {
   return e;
 }
 
-function toFormData(s: FormState): FormData {
+function toFormData(campus: Campus, s: FormState): FormData {
   const data = new FormData();
   data.set("name", s.name.trim());
   data.set("contact", s.contact.trim());
-  data.set("campus", s.campus);
+  data.set("campus", campus);
   data.set("location", s.location);
   data.set("shareType", s.shareType);
   data.set("feedback", s.feedback.trim());
@@ -122,7 +117,8 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-export function FeedbackForm() {
+// The form for one campus; the page decides which (see app/[campus]/page.tsx).
+export function FeedbackForm({ campus }: { campus: Campus }) {
   const [step, setStep] = useState(0);
   const [state, setState] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
@@ -131,12 +127,7 @@ export function FeedbackForm() {
   const topRef = useRef<HTMLDivElement>(null);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setState((s) => {
-      const next = { ...s, [key]: value };
-      // Locations and products differ per campus.
-      if (key === "campus" && value !== s.campus) Object.assign(next, { location: "", products: [], productOther: "" });
-      return next;
-    });
+    setState((s) => ({ ...s, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
   }
 
@@ -158,7 +149,7 @@ export function FeedbackForm() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/feedback", { method: "POST", body: toFormData(state) });
+      const res = await fetch("/api/feedback", { method: "POST", body: toFormData(campus, state) });
       const result = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!res.ok || !result.ok) throw new Error(result.error || `The server responded with ${res.status}.`);
       setDone(true);
@@ -252,45 +243,20 @@ export function FeedbackForm() {
         )}
 
         {step === 1 && (
-          <>
-            <fieldset className="space-y-3">
-              <legend className="mb-3 text-sm font-medium">Campus</legend>
-              <RadioGroup
-                value={state.campus}
-                onValueChange={(v) => update("campus", v as Campus)}
-                className="grid grid-cols-2 gap-3"
-                {...err("campus")}
-              >
-                {(["SNS", "TKH"] as const).map((c) => (
-                  <ChoiceCard
-                    key={c}
-                    value={c}
-                    title={c}
-                    icon={<span className="font-heading text-sm font-semibold">{c[0]}</span>}
-                    {...err("campus")}
-                  />
-                ))}
-              </RadioGroup>
-              <FieldError id="campus-error" message={errors.campus} />
-            </fieldset>
-
-            {state.campus && (
-              <fieldset className="space-y-3 animate-in fade-in-0 slide-in-from-top-2 duration-300">
-                <legend className="mb-3 text-sm font-medium">Select {state.campus} Location</legend>
-                <RadioGroup
-                  value={state.location}
-                  onValueChange={(v) => update("location", v)}
-                  className="grid gap-2 sm:grid-cols-2"
-                  {...err("location")}
-                >
-                  {LOCATIONS[state.campus].map((loc) => (
-                    <ChoiceCard key={loc} value={loc} title={loc} icon={<MapPinIcon />} className="py-3" {...err("location")} />
-                  ))}
-                </RadioGroup>
-                <FieldError id="location-error" message={errors.location} />
-              </fieldset>
-            )}
-          </>
+          <fieldset className="space-y-3">
+            <legend className="mb-3 text-sm font-medium">Select Location</legend>
+            <RadioGroup
+              value={state.location}
+              onValueChange={(v) => update("location", v)}
+              className="grid gap-2 sm:grid-cols-2"
+              {...err("location")}
+            >
+              {LOCATIONS[campus].map((loc) => (
+                <ChoiceCard key={loc} value={loc} title={loc} icon={<MapPinIcon />} className="py-3" {...err("location")} />
+              ))}
+            </RadioGroup>
+            <FieldError id="location-error" message={errors.location} />
+          </fieldset>
         )}
 
         {step === 2 && (
@@ -317,7 +283,7 @@ export function FeedbackForm() {
           </fieldset>
         )}
 
-        {step === 3 && state.shareType === "Product Enquiry" && state.campus && (
+        {step === 3 && state.shareType === "Product Enquiry" && (
           <fieldset className="space-y-4">
             <div className="flex items-baseline justify-between gap-4">
               <legend className="text-sm font-medium">
@@ -327,7 +293,7 @@ export function FeedbackForm() {
                 <span className="shrink-0 text-xs font-medium text-primary">{state.products.length} selected</span>
               )}
             </div>
-            {PRODUCTS[state.campus].map((group) => (
+            {PRODUCTS[campus].map((group) => (
               <div key={group.title} className="space-y-2">
                 <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">{group.title}</p>
                 <ToggleGroup

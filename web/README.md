@@ -1,6 +1,7 @@
 # Kotu Customer Feedback
 
-The customer feedback form (`/`) and the admin Responses page (`/responses`),
+The customer feedback forms — one per school, Shiv Nadar School (`/sns`) and
+The Knowledge Habitat (`/tkh`) — and the admin Responses page (`/responses`),
 built with Next.js, Tailwind CSS and shadcn/ui. Everything runs in this one
 app: responses are saved in a SQLite database and photos in an uploads folder,
 both on the server. No outside services.
@@ -13,8 +14,9 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000> for the form and <http://localhost:3000/responses>
-for the admin page.
+Open <http://localhost:3000/sns> or <http://localhost:3000/tkh> for the forms
+and <http://localhost:3000/responses> for the admin page. Share each school
+only its own link; `/` itself shows neither form.
 
 ## Deploy to a server
 
@@ -51,8 +53,8 @@ over plain HTTP. If nginx is in front, allow uploads of up to 30 MB
 
 | Path | What it is |
 |---|---|
-| `app/page.tsx`, `components/feedback-form.tsx` | The 4-step feedback form |
-| `lib/form-options.ts` | Campuses, locations, products, share types |
+| `app/[campus]/page.tsx`, `components/feedback-form.tsx` | The 4-step feedback form, one per school |
+| `lib/form-options.ts` | Schools, locations, products, share types |
 | `app/api/feedback/route.ts` | Receives form submissions |
 | `lib/server/submission.ts` | Server-side checks of a submission, including photo type |
 | `lib/server/db.ts` | Database and photo storage |

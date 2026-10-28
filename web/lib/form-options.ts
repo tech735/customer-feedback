@@ -3,6 +3,17 @@
 
 export type Campus = "SNS" | "TKH";
 
+// Each campus has its own form at /sns and /tkh.
+export const CAMPUS_NAMES: Record<Campus, string> = {
+  SNS: "Shiv Nadar School",
+  TKH: "The Knowledge Habitat",
+};
+
+// Full name for a stored campus code, e.g. on the admin page.
+export function campusName(code: string) {
+  return CAMPUS_NAMES[code as Campus] ?? code;
+}
+
 export const LOCATIONS: Record<Campus, string[]> = {
   SNS: ["SNS Gurgaon", "SNS Chennai", "SNS Noida", "SNS Faridabad"],
   TKH: ["Gurgaon", "Pune", "Bangalore"],

@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { campusName } from "@/lib/form-options";
 import type { FeedbackResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +59,7 @@ function toCsv(rows: FeedbackResponse[]) {
       fullDate.format(new Date(r.timestamp)),
       r.name,
       r.contact,
-      r.campus,
+      campusName(r.campus),
       r.location,
       r.shareType,
       r.products.join(", "),
