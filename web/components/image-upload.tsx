@@ -1,10 +1,15 @@
 "use client";
 
-import { ImagePlusIcon, XIcon } from "lucide-react";
+import { CameraIcon, ImageIcon, ImagePlusIcon, XIcon } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MAX_IMAGE_BYTES, MAX_IMAGES } from "@/lib/form-options";
 import { cn } from "@/lib/utils";
+
+// Phones and tablets can open the camera straight from a file input; on a
+// computer `capture` is ignored, so there the button just opens the file picker.
+const canUseCamera = () => window.matchMedia("(pointer: coarse)").matches;
 
 export function ImageUpload({
   label,
@@ -16,7 +21,9 @@ export function ImageUpload({
   onChange: (files: File[]) => void;
 }) {
   const id = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
 
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
@@ -33,6 +40,22 @@ export function ImageUpload({
   }
 
   const full = files.length >= MAX_IMAGES;
+  const fileInput = (ref: React.RefObject<HTMLInputElement | null>, camera: boolean) => (
+    <input
+      ref={ref}
+      type="file"
+      accept="image/*"
+      multiple={!camera}
+      capture={camera ? "environment" : undefined}
+      tabIndex={-1}
+      aria-hidden
+      className="hidden"
+      onChange={(e) => {
+        add(e.target.files);
+        e.target.value = "";
+      }}
+    />
+  );
 
   return (
     <div className="space-y-2">
@@ -62,45 +85,60 @@ export function ImageUpload({
         ))}
 
         {!full && (
-          <label
-            htmlFor={id}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragging(true);
-            }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDragging(false);
-              add(e.dataTransfer.files);
-            }}
-            className={cn(
-              "flex cursor-pointer items-center gap-3 rounded-xl border-[1.5px] border-dashed border-[#C9C7DC] bg-[#FAFAFE] px-4 py-3 text-sm transition-colors hover:border-primary hover:bg-accent has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/40",
-              files.length ? "h-20" : "w-full py-5",
-              dragging && "border-primary bg-accent",
-            )}
-          >
-            <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-card text-primary shadow-xs">
-              <ImagePlusIcon className="size-5" />
-            </span>
-            <span className={cn(files.length && "sr-only sm:not-sr-only")}>
-              <span className="block font-medium text-primary">{files.length ? "Add more" : "Add photos"}</span>
-              <span className="block text-xs text-muted-foreground">PNG or JPG · up to 5 MB each</span>
-            </span>
-            <input
-              ref={inputRef}
-              id={id}
-              type="file"
-              accept="image/*"
-              multiple
-              className="sr-only"
-              onChange={(e) => {
-                add(e.target.files);
-                e.target.value = "";
-              }}
-            />
-          </label>
+          // On touch devices the button asks camera or gallery first.
+          <DropdownMenu open={menuOpen} onOpenChange={(open) => setMenuOpen(open && canUseCamera())}>
+            <DropdownMenuTrigger asChild>
+              <button
+                id={id}
+                type="button"
+                onClick={() => {
+                  if (!canUseCamera()) galleryRef.current?.click();
+                }}
+                onKeyDown={(e) => {
+                  // The menu trigger swallows Enter and Space, which would
+                  // otherwise click the button.
+                  if (!canUseCamera() && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    galleryRef.current?.click();
+                  }
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragging(false);
+                  add(e.dataTransfer.files);
+                }}
+                className={cn(
+                  "flex cursor-pointer items-center gap-3 rounded-xl border-[1.5px] border-dashed border-[#C9C7DC] bg-[#FAFAFE] px-4 py-3 text-left text-sm transition-colors outline-none hover:border-primary hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/40",
+                  files.length ? "h-20" : "w-full py-5",
+                  (dragging || menuOpen) && "border-primary bg-accent",
+                )}
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-card text-primary shadow-xs">
+                  <ImagePlusIcon className="size-5" />
+                </span>
+                <span className={cn(files.length && "sr-only sm:not-sr-only")}>
+                  <span className="block font-medium text-primary">{files.length ? "Add more" : "Add photos"}</span>
+                  <span className="block text-xs text-muted-foreground">PNG or JPG · up to 5 MB each</span>
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-60 p-1.5">
+              <DropdownMenuItem onSelect={() => cameraRef.current?.click()} className="gap-3 px-2.5 py-2.5 text-base">
+                <CameraIcon className="size-5 text-primary" /> Take photo
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => galleryRef.current?.click()} className="gap-3 px-2.5 py-2.5 text-base">
+                <ImageIcon className="size-5 text-primary" /> Choose from gallery
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
+        {fileInput(cameraRef, true)}
+        {fileInput(galleryRef, false)}
       </div>
     </div>
   );
